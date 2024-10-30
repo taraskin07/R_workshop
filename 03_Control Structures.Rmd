@@ -1,0 +1,386 @@
+---
+title: "Chapter 02: Control Structures: if-else, for and while loops, and functions."
+author: "Aleksandr Taraskin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Chapter 02: Control Structures: if-else, for and while loops, and functions.
+
+Sample dataset is the same: “ToothGrowth”. The tooth growth data set is the length of the odontoblasts (teeth) in each of 10 guinea pigs at three Vitamin C dosage levels (0.5, 1, and 2 mg) with two delivery methods (orange juice or ascorbic acid).
+
+The file contains 60 observations of 3 variables
+
+    len : Tooth length
+    supp : Supplement type (VC or OJ)
+    dose : Dose in milligrams
+
+
+```{r}
+# Load the built-in mtcars dataset
+data(ToothGrowth)
+# Rename it to look more concise
+dataset <- ToothGrowth
+# Display the first 6 (default) rows
+head(dataset)
+```
+
+## 2.1 `If-else` condition
+
+# Introduction
+The `if-else` statement in R is a control structure that allows you to execute different pieces of code based on certain conditions. It is useful for decision-making processes in your code.
+
+# Basic Syntax
+The basic syntax of an `if` statement is:
+
+```{r}
+condition <- TRUE
+if (condition) {
+  # Code to execute if condition is true
+} else {
+  # Code to execute if condition is false
+}
+```
+
+Example
+
+```{r}
+# Define a number
+number <- 3
+
+# Check if the number is positive or negative
+if (number > 0) {
+  result <- "The number is positive."
+} else {
+  result <- "The number is negative or zero."
+}
+print(result)
+```
+Several condition are also possible
+
+```{r}
+# Define a score
+score <- 85
+
+# Categorizing the score
+if (score < 50) {
+  category <- "Poor"
+} else if (score < 75) {
+  category <- "Average"
+} else {
+  category <- "Good"
+}
+
+print(category)
+```
+
+## 2.2 `for` and `while` loops
+
+### 2.2.1 `for` loop
+
+A for loop in R is a control structure used to execute a block of code repeatedly for a specified number of iterations. It allows you to iterate over a sequence (such as a vector, list, or other collection) and perform operations on each element sequentially. 
+
+### Basic Syntax
+
+The basic syntax of a for loop in R is as follows:
+
+```{r}
+sequence <- c(1,2,3,4,5)
+for (variable in sequence) {
+  # Code to be executed in each iteration
+}
+```
+
+`- variable`: This is the name you choose for the counter that takes on the value of each element in the sequence during each iteration of the loop.
+`- sequence`: This is the collection (vector, list, etc.) that the loop iterates over.
+
+### Example
+
+Here's a simple example of a for loop in R that prints each number from 1 to 5:
+
+```{r}
+for (i in 1:7) {
+  print(i)  # This prints the current value of i
+}
+```
+
+
+### Looping Through Vectors
+
+You can also use a for loop to iterate through the elements of a vector. For example:
+
+```{r}
+vector_of_names <- c("apple", "banana", "cherry")
+
+for (fruit in vector_of_names) {
+  print(fruit)  # This prints each fruit in the vector
+}
+```
+Applying those approaches we can iterate over the amount of rows of our dataset
+```{r}
+# Gives us the total amount of rows
+nrow(dataset)
+```
+
+
+```{r}
+for (i in 1:nrow(dataset)) {print(i)}
+```
+
+```{r}
+for (supplement in dataset$supp) {print(supplement)}
+```
+
+### 2.2.2 `while` loop
+
+A while loop in R is another control structure that allows you to execute a block of code repeatedly as long as a specified condition evaluates to TRUE. It is particularly useful when you do not know in advance how many iterations you need, as it continues looping until the condition becomes FALSE.
+
+### Basic Syntax
+
+The basic syntax of a while loop in R is as follows:
+
+```{r}
+condition <- F
+while (condition) {
+  # Code to be executed while the condition is TRUE
+}
+```
+
+
+`- condition`: This is a logical expression that is evaluated before each iteration. If it evaluates to TRUE, the code block will execute; if it evaluates to FALSE, the loop will stop.
+
+### Example
+
+Here’s a simple example of a while loop that prints numbers from 1 to 5:
+
+```{r}
+i <- 1  # Initialize the counter
+maxv <- 5
+
+while (i <= maxv) {
+  print(i)  # Print the current value of i
+  i <- i + 1  # Increment the counter
+}
+```
+
+
+### Using a while Loop for Cumulative Total
+
+You can also use a while loop for tasks like calculating the amount of necessary iterations in order to reach a specific threshold.
+
+```{r}
+total <- 0  # Initialize total
+i <- 0  # Initialize counter
+
+while (total < 636) {
+  total <- total + 2.376  # 2.376 increment
+  i <- i + 1  # Increment counter
+}
+
+print(i)  # How many iterations we need to reach 636 value
+```
+
+
+Now lets apply our knowledge to our favourite dataset:
+
+`Categorizing Tooth Length`
+We will categorize the tooth lengths into three categories: Short, Medium, and Long, based on the length values.
+
+
+```{r}
+# Initialize a new column for categories
+dataset$LengthCategory <- ""
+
+# Loop through the dataset to categorize tooth length
+for (i in 1:nrow(dataset)) {
+  if (dataset$len[i] < 20) {
+    dataset$LengthCategory[i] <- "Short"
+  } else if (dataset$len[i] >= 20 & dataset$len[i] < 30) {
+    dataset$LengthCategory[i] <- "Medium"
+  } else {
+    dataset$LengthCategory[i] <- "Long"
+  }
+}
+```
+
+Let's look at the single value that corresponds the element number 52 (index = 52) in column dataset$len:
+```{r}
+dataset$len[52]
+```
+
+```{r}
+dataset$len[52] >= 20 
+dataset$len[52] < 30
+dataset$len[52] >= 20 & dataset$len[52] < 30
+```
+```{r}
+if (dataset$len[52] >= 20 & dataset$len[52] < 30) {
+    dataset$LengthCategory[52] <- "Medium"}
+
+dataset$LengthCategory[52]
+```
+
+################################################################################
+# TASK
+################################################################################
+
+Change the code so instead of `for` loop you use `while` loop
+# Reminder: `nrow(dataset)` returns the amount of rows of the dataset, one value
+
+
+```{r}
+# Initialize a new column for categories
+dataset$LengthCategory <- ""
+
+# Loop through the dataset to categorize tooth length
+
+# you can use 
+i <- 1
+
+# Modify the line below!!
+################################################################################
+for (i in 1:nrow(dataset)) {
+################################################################################
+  
+    if (dataset$len[i] < 20) {
+    dataset$LengthCategory[i] <- "Short"
+  } else if (dataset$len[i] >= 20 & dataset$len[i] < 30) {
+    dataset$LengthCategory[i] <- "Medium"
+  } else {
+    dataset$LengthCategory[i] <- "Long"
+  }
+
+  # and here increase it
+  i <- i + 1
+
+  
+}
+```
+
+### 2.3 Functions
+
+Instead of writing loops or anything else over and over again we can create a function with easier syntax
+
+```{r}
+brand_new_function <- function(argument1, argument2, ...) {
+  # code
+}
+```
+
+Let's modify our loop for column LengthCategory and create more general function where you can add new column, specify its name, intervals and new values
+
+This is a reminder how the loop looks like, but now we call the column in a slightly different way, using double brackets `[[ ]]`
+```{r}
+# Initialize a new column for categories
+dataset[["LengthCategory"]] <- ""
+
+# Loop through the dataset to categorize tooth length
+for (i in 1:nrow(dataset)) {
+  if (dataset[["len"]][i] < 20) {
+    dataset[["LengthCategory"]][i] <- "Short"
+  } else if (dataset[["len"]][i] >= 20 & dataset[["len"]][i] < 30) {
+    dataset[["LengthCategory"]][i] <- "Medium"
+  } else {
+    dataset[["LengthCategory"]][i] <- "Long"
+  }
+}
+```
+
+```{r}
+brand_new_function <- function(datatable, 
+                               new_col_name, 
+                               filter_column, 
+                               threshold1,
+                               threshold2,
+                               new_val1 = "Short", 
+                               new_val2 = "Medium", 
+                               new_val3 = "Long") {
+  # Initialize a new column for categories
+  datatable[[new_col_name]] <- ""
+  
+  # Loop through the dataset to categorize tooth length
+  for (i in 1:nrow(datatable)) {
+    if (datatable[[filter_column]][i] < threshold1) {
+      datatable[[new_col_name]][i] <- new_val1
+    } else if (datatable[[filter_column]][i] >= threshold1 & datatable[[filter_column]][i] < threshold2) {
+      datatable[[new_col_name]][i] <- new_val2
+    } else {
+      datatable[[new_col_name]][i] <- new_val3
+    }
+  }
+  
+  return(datatable)
+}
+```
+
+```{r}
+brand_new_table <-  brand_new_function(datatable = dataset, 
+                                       new_col_name = "NewThreshold", 
+                                       filter_column = "len", 
+                                       threshold1 = 15,
+                                       threshold2 = 25 #,
+                                       # new_val1 = "Short", 
+                                       # new_val2 = "Medium", 
+                                       # new_val3 = "Long"
+                                       )
+head(brand_new_table)
+```
+
+```{r}
+brand_new_table <-  brand_new_function(datatable = dataset, 
+                                       new_col_name = "NewThreshold", 
+                                       filter_column = "len", 
+                                       threshold1 = 15,
+                                       threshold2 = 25,
+                                       new_val1 = "Tiny",
+                                       new_val2 = "Average",
+                                       new_val3 = "Nutcracker"
+                                       )
+head(brand_new_table)
+```
+```{r}
+brand_new_table <-  brand_new_function(datatable = dataset, 
+                                       new_col_name = "NewThreshold", 
+                                       filter_column = "dose", 
+                                       threshold1 = 1,
+                                       threshold2 = 2,
+                                       new_val1 = "Diluted Juice",
+                                       new_val2 = "Juice",
+                                       new_val3 = "Concentrate"
+                                       )
+head(brand_new_table)
+```
+Simple example
+
+```{r}
+linearEquation <- function(x) {
+  y <- x^2+8
+  return(y)
+}
+
+y <- linearEquation(8)
+print(y)
+```
+
+################################################################################
+# TASK
+################################################################################
+Create a function which divides the value entered by 5 and then substract 7
+
+```{r}
+divide_by_5_minus_7 <- function(x) {
+  # y <- ...
+  # ...
+  }
+
+divide_by_5_minus_7(625) == 118
+```
+
+
+
+### Conclusion 
+
+In this document, we successfully categorized tooth lengths in the ToothGrowth dataset by leveraging `for`/`while` loops along with if-else statements. The summary table provides insights into the distribution of tooth lengths across the different types of supplements provided. Moreover, we learned how to create and use functions to automate routine actions.

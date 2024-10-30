@@ -1,0 +1,157 @@
+---
+title: "Chapter 01. Part 2: Basic Data Manipulation. Sorting."
+author: "Aleksandr Taraskin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Chapter 01: Basic Data Manipulation. Sorting.
+
+## 1.2 Sorting data
+
+Data sorting in R refers to the process of arranging the rows of a data frame or the elements of a vector in a specific order based on the values of one or more columns or attributes. Sorting can be done in ascending or descending order and is useful for data analysis, visualization, and reporting when you want to organize your data for better insights.
+
+
+One of the standard learning data sets included in R is the “ToothGrowth” data set. The tooth growth data set is the length of the odontoblasts (teeth) in each of 10 guinea pigs at three Vitamin C dosage levels (0.5, 1, and 2 mg) with two delivery methods (orange juice or ascorbic acid).
+
+The file contains 60 observations of 3 variables
+
+    len : Tooth length
+    supp : Supplement type (VC or OJ)
+    dose : Dose in milligrams
+
+
+```{r}
+# Load the built-in mtcars dataset
+data(ToothGrowth)
+# Rename it to look more concise
+dataset <- ToothGrowth
+# Display the first 6 (default) rows
+head(dataset)
+```
+
+### 1.2.1 Sort and order functions
+
+There are two main functions that we can use to arrange the data:
+`sort()`
+`order()`
+
+Let's see how they work
+```{r}
+dataset$len
+```
+`sort()` function helps us to organize values in ascending order by default
+```{r}
+sort(dataset$len)
+```
+
+Descending? Not a problem
+```{r}
+sort(dataset$len, decreasing = TRUE)
+```
+
+
+What if we want to organize not values themselves but the dataframe (its rows, so the "len" column is sorted in ascending order)
+```{r}
+# It won't work like that, there are no additional parameters to pass in sort() function, like column to sort
+# sort(dataset)
+
+# That is where the order() function gets useful! What does it do?
+order(dataset$len)
+```
+
+Those numbers shows us the correct indices of rows (their order). So if we rearrange them in accordance to these indices our "len" column will look sorted from minimum to maximum
+```{r}
+# What do we have now?
+head(dataset)
+```
+Let's reorganize it!
+```{r}
+dataset$len[c(3,2,1)]
+```
+```{r}
+indices_to_order_data <- order(dataset$len)
+indices_to_order_data
+```
+```{r}
+dataset$len[indices_to_order_data]
+```
+```{r}
+dataset$len[order(dataset$len)]
+```
+But we need to order the dataframe, not just one column "len".
+Not a problem, just keep in mind that dataframe is a matrix: `[rows x columns]`
+Those indices are for the new order of rows (first element in `dataframe[rows, columns]`)
+
+```{r}
+dataset[indices_to_order_data, ]
+# The same as: 
+# dataset[order(dataset$len), ]
+```
+
+The same argument `decreasing = TRUE` is applicable to `order()`
+
+```{r}
+dataset[order(dataset$len, decreasing = TRUE), ]
+```
+
+
+Another trick to order from max to min
+
+```{r}
+-dataset$len
+```
+################################################################################
+# Better to use with `order()` only!
+################################################################################
+```{r}
+order(-dataset$len)
+order(dataset$len, decreasing = TRUE)
+```
+
+### 1.2.2 Multiple sorting
+In "dose" column we hame only 3 unique values, 20 elements each
+```{r}
+table(dataset["dose"])
+```
+
+What if we want to keep both the "dose" column ascending order, but inside each of three dosage groups rearrange "len" column values.
+
+```{r}
+dataset[order(dataset$dose, dataset$len), ]
+```
+
+Let's look at the dosage 1 mg:
+
+```{r}
+sorted_ds <- dataset[order(dataset$dose, dataset$len), ]
+sorted_ds[sorted_ds$dose == 1, ]
+```
+
+And even more!
+
+```{r}
+dataset[order(dataset$dose, dataset$supp, dataset$len), ]
+```
+
+Now data looks neat and clean!
+
+
+################################################################################
+# TASK
+################################################################################
+
+Now do the same (multiple sorting) but in descending order only for "len" column. Dosage should be the same, from min to max.
+
+```{r}
+
+```
+
+
+### Conclusion 
+
+We learned how to sort vector/(dataset based on any column) in ascending and descending order. Then demonstrated how to sort by multiple columns, even if more than two!
+

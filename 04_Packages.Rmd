@@ -1,0 +1,105 @@
+---
+title: "Chapter 03: Intro to Packages: Installing and loading packages."
+author: "Aleksandr Taraskin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Chapter 03: Intro to Packages: Installing and loading packages.
+
+## 3.1 Packages and libraries in R.
+
+In R, packages are collections of R functions, data, and compiled code
+in a well-defined format. They extend the functionality of R by
+providing tools for specific tasks, such as data manipulation,
+visualization, or statistical analysis. Libraries are the directories
+where packages are stored after installation.
+
+```         
+Packages:
+    Each package in R is a bundle that includes:
+        Functions and code: R functions that are specific to the package’s purpose.
+        Documentation: Manuals and help files for each function and feature.
+        Dependencies: Other R packages that the package relies on.
+    Thousands of packages are available in CRAN (Comprehensive R Archive Network), Bioconductor (for bioinformatics), and GitHub (for developmental versions and custom packages).
+
+Libraries:
+    A library in R refers to the location or directory on your system where packages are installed.
+    R packages can be installed in different libraries (directories), which allows you to have packages with different versions in separate locations.
+
+Installing vs. Loading Packages:
+    Installing a package: Adds the package files to your R library (e.g., install.packages("dplyr")). Installation is done only once per version of the package.
+    Loading a package: Activates the package for your current R session, making its functions and datasets available. This is done using library() or require().
+```
+
+################################################################################ 
+
+`Why We Load Packages Using library()`
+
+When we use **`library()`** to load a package, it can be misleading
+since it implies that we are dealing with a library (the directory),
+whereas, in fact, we are loading a package. From a naming perspective,
+it would make more sense to call this function package() or
+load_package().
+
+`Why Did This Naming Choice Happen Historically?`
+
+The confusion originates from historical reasons, as the concept of
+libraries in R came from older languages and systems, like `S` (the
+predecessor of R), where the term **"library"** was already used for
+working with external modules. This term became common in R and was not
+changed to maintain compatibility and avoid disrupting user habits.
+
+So, while the name `library()` is somewhat imprecise, it’s become the
+standard, and most R users are used to it. **You can also use
+`require()` to load a package, but it behaves slightly differently:
+unlike `library()`, if a package is missing, it doesn’t throw an error
+but instead returns FALSE. This is useful for programming but can cause
+issues in interactive sessions if the package isn’t actually loaded.**
+
+################################################################################ 
+
+To use functions from a package, R needs to load the package into the
+current session. Here’s why we use library():
+
+```         
+Namespace Loading: When you load a package with library(package_name), R makes the functions and datasets within the package available in the session’s namespace. Without loading, R doesn’t know where to find the functions specific to that package.
+
+Avoiding Naming Conflicts: R keeps track of functions by namespaces, which prevents naming conflicts between packages. For example, filter() exists in both dplyr and stats packages. Loading a package sets priority within your session to avoid ambiguity.
+
+Code Consistency: Explicitly loading packages at the start of a script (often in an R Markdown or R script header) ensures that all required packages are present, creating a self-contained, reproducible environment.
+```
+
+################################################################################ 
+
+################################################################################ 
+
+################################################################################ 
+
+## 3.2 Installing packages
+
+### 3.2.1 Package "renv"
+
+[renv Presentation](renv_in_R.pptx)
+
+```{r}
+install.packages("dplyr")
+```
+
+```{r}
+library("dplyr")
+```
+
+
+```{r}
+stats::filter()
+dplyr::filter()
+```
+
+
+### Conclusion
+
+In this document, we learned about packages (where to find them) and libraries (where to download them from) in R, how to install and load packages in the current namespace. The importance of the package "renv", the way how it is designed and how to use it in everyday work.
