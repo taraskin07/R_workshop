@@ -1,0 +1,42 @@
+---
+title: "Chapter 05: Using vectors and apply functions to speed up the process."
+author: "Aleksandr Taraskin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Chapter 05: Using vectors and apply functions to speed up the process.
+
+## 5 Difference between loops and vector operations
+
+```{r}
+# Set up a large numeric vector
+set.seed(123)
+large_vector <- runif(1e7)  # 10 million random numbers
+
+# Method 1: Using a for loop
+system.time({
+  squared_loop <- numeric(length(large_vector))
+  for (i in seq_along(large_vector)) {
+    squared_loop[i] <- large_vector[i]^2
+  }
+})
+
+# Method 2: Using vectorized operation
+system.time({
+  squared_vectorized <- large_vector^2
+})
+
+
+# Compare results (should be identical)
+all.equal(squared_loop, squared_vectorized)
+```
+
+
+
+### Conclusion
+
+Use vectors and vector operations - they are faster!

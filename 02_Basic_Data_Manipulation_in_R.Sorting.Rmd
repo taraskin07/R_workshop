@@ -25,7 +25,7 @@ The file contains 60 observations of 3 variables
 
 
 ```{r}
-# Load the built-in mtcars dataset
+# Load the built-in dataset
 data(ToothGrowth)
 # Rename it to look more concise
 dataset <- ToothGrowth

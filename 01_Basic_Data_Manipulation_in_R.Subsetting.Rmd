@@ -33,7 +33,7 @@ The file contains 60 observations of 3 variables
 
 
 ```{r}
-# Load the built-in mtcars dataset
+# Load the built-in dataset
 data(ToothGrowth)
 # Rename it to look more concise
 dataset <- ToothGrowth
@@ -140,7 +140,7 @@ dataset[, 2]
 Wait. What will happen if we put the first index instead?
 We will subset a row!
 ```{r}
-dataset[2 , ]
+dataset[2, ]
 ```
 If we specify both the first and the second index - we get the value!
 
@@ -195,7 +195,7 @@ dataset[1:5, 3]
 ```
 
 
-#### Logical Subsetting. Filtering.
+#### 1.1.3 Logical Subsetting. Filtering.
 
 You can extract rows based on conditions. For example, to extract all
 guinea pigs which drank orange juice =)
@@ -252,7 +252,7 @@ dataset[dataset$len > 19.25, ]
 ```
 
 
-### 1.1.3 Combining Row and Column Extraction
+### 1.1.4 Combining Row and Column Extraction
 
 You can extract both rows and columns simultaneously. 
 ```{r}

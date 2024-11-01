@@ -1,0 +1,297 @@
+---
+title: "Chapter 04: Data Wrangling with dplyr: Filtering, grouping, summarizing, and joining datasets."
+author: "Aleksandr Taraskin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Chapter 04: Data Wrangling with dplyr: Filtering, grouping, summarizing, and joining datasets.
+
+## 4.1 Package "dplyr"
+
+The dplyr package in R is a powerful and widely used package designed for data manipulation and transformation. Developed as part of the tidyverse ecosystem, dplyr provides an intuitive and consistent set of functions to work with data frames and other tabular data structures, making it easier to clean, filter, summarize, and transform data. It’s especially popular in data science and analytics because it simplifies common data manipulation tasks.
+
+To use dplyr we need to load it first
+```{r}
+library(dplyr)
+```
+
+Now let's upload our favourite dataset
+```{r}
+# Load the built-in dataset
+data(ToothGrowth)
+# Rename it to look more concise
+dataset <- ToothGrowth
+# Display the first 6 (default) rows
+head(dataset)
+```
+
+
+### 4.1.1 Extracting Columns
+
+List columns
+```{r}
+colnames(dataset)
+```
+List of rows
+```{r}
+rownames(dataset)
+```
+
+The main feature of dplyr is the "pipe" operator, it looks like that:
+
+`%>%`
+
+Now instead of `dataset["supp"]` let's use "dplyr" package for that
+```{r}
+output <- dataset %>% 
+  select("supp")
+output
+```
+
+We can operate with output in the same way
+
+```{r}
+table(output)
+```
+
+But what is the `dataset[["supp"]]` alternative in this case?
+
+```{r}
+#  old way
+dataset[["supp"]]
+
+# new way
+output <- dataset %>% 
+  pull("supp")
+output
+```
+
+In base R we know how to extract column by its index: `dataset[, 2]`
+What is the equvalent in "dplyr"
+```{r}
+# old way
+dataset[, 2]
+
+#  new way
+output <- dataset %>% 
+  pull(2)
+output
+```
+
+### 4.1.2 Extracting Rows
+
+Now row
+```{r}
+#  old way
+dataset[2, ]
+
+#  new way
+output <- dataset %>% 
+  slice(2)
+output
+```
+
+This internal structure `1:5` also called a "slice"
+
+```{r}
+#  old way
+dataset[1:5, ]
+
+#  new way
+output <- dataset %>% 
+  slice(1:5)
+output
+```
+
+
+Now both indices are used
+
+```{r}
+#  old way
+dataset[1,2]
+
+
+#  new way
+output <- dataset %>% 
+  slice(1) %>% 
+  pull(2)
+output
+```
+
+```{r}
+#  old way
+dataset[2,3]
+
+
+#  new way
+output <- dataset %>% 
+  slice(2) %>% 
+  pull(3)
+output
+```
+
+
+```{r}
+#  old way
+dataset[1:5, 3]
+
+
+#  new way
+output <- dataset %>% 
+  slice(1:5) %>% 
+  pull(3)
+output
+```
+
+#### 4.2 Logical Subsetting. Filtering.
+
+Extracting all guinea pigs which drank orange juice
+
+```{r}
+# Condition in this case is in the specific column, but we return corresponding rows
+# old way
+dataset[dataset$supp == "VC", ]
+
+# new way
+output <- dataset %>% 
+  filter(supp == "VC")
+output
+```
+
+The same for any other type of conditions.
+
+```{r}
+summary(dataset$len)
+```
+Higher than median
+```{r}
+# old way
+dataset[dataset$len > 19.25, ]
+# new way
+output <- dataset %>% 
+  filter(len > 19.25)
+output
+```
+
+Now where the "pipe" gets useful:
+
+```{r}
+# old way
+dataset[dataset$len > 19.25, c("len", "dose")]
+
+# new way
+
+# new way
+output <- dataset %>% 
+  filter(len > 19.25) %>% 
+  select(c("len", "dose"))
+output
+```
+
+Multiple conditions. Logical "AND"
+```{r}
+#  old way
+dataset[(dataset$len > 19.25 & dataset$dose == 2), c("len", "dose")]
+
+#  new way
+output <- dataset %>% 
+  filter(len > 19.25 & dose == 2) %>% 
+  select(c("len", "dose"))
+output
+```
+
+Logical "OR"
+
+```{r}
+# old way
+extreme <- dataset[(dataset$len > 25.27 | dataset$len < 13.07), c("len", "dose")]
+extreme
+
+# new way
+output <- dataset %>% 
+  filter(dataset$len > 25.27 | dataset$len < 13.07) %>% 
+  select(c("len", "dose"))
+output
+```
+
+################################################################################
+# TASK
+################################################################################
+
+What are extreme "len" values for dosage level 1 mg?
+```{r}
+#  old way
+extreme <- dataset[(dataset$len > 25.27 | dataset$len < 13.07) & dataset$dose == 2, c("len", "dose")]
+extreme
+```
+
+Write your answer here:
+```{r}
+# new way
+output <- dataset %>%
+  filter() %>%
+  select()
+output
+```
+
+### 4.3 Sort and order functions alternatives in "dplyr"
+
+In dplyr, the functions arrange() and desc() are used as alternatives to sort() in base R, function order() is not needed but can be used independently as it is. arrange() and desc() functions allow you to easily sort rows of a data frame based on one or more columns.
+
+The arrange() function in dplyr sorts the rows of a data frame based on specified columns in ascending order by default.
+
+```{r}
+#  old way
+sort(dataset$len)
+
+#  new way 
+output <- dataset %>% 
+  arrange(len) %>% 
+  pull(len)
+output
+```
+
+To sort in descending order, use desc() within arrange()
+
+```{r}
+#  old way
+sort(dataset$len, decreasing = TRUE)
+
+#  new way 
+output <- dataset %>% 
+  arrange(desc(len)) %>% 
+  pull(len)
+output
+```
+
+Sorting by Multiple Columns
+
+You can sort by multiple columns by listing them in arrange(). Sorting will proceed in the order of the columns specified.
+
+```{r}
+# ola way
+dataset[order(dataset$dose, dataset$supp, -dataset$len), ]
+
+# new way
+output <- dataset %>% 
+  arrange(dose, supp, desc(len))
+output
+```
+
+################################################################################
+# TASK
+################################################################################
+Combine filter() and arrange() functions to filter "len" column values lower than 10 and sort them in descending order
+
+```{r}
+
+```
+
+
+### Conclusion
+
+In this document, we compared two approaches of data manipulation in R: using base R and "dplyr" package. We compared how to extract subsets of data from a dataframe in R. This included extracting individual columns, rows by indices, and logical conditions, as well as combinations of these methods. We learned how to sort vector/(dataset based on any column) in ascending and descending order. Then demonstrated how to sort by multiple columns, even if more than two with both ways!
