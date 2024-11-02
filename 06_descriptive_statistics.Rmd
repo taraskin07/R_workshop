@@ -1,0 +1,473 @@
+---
+title: "Chapter 06: Descriptive Statistics: Mean, median, standard deviation, and summary statistics."
+author: "Aleksandr Taraskin"
+date: "`r Sys.Date()`"
+output: html_document
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+# Chapter 06: Descriptive Statistics: Mean, median, standard deviation, and summary statistics.
+
+```{r}
+# Load the built-in dataset
+data(ToothGrowth)
+# Rename it to look more concise
+dataset <- ToothGrowth
+# Display the first 6 (default) rows
+head(dataset)
+```
+
+Descriptive statistics refers to a set of techniques and methods used to
+summarize, organize, and present data in a meaningful way. It provides a
+simple and informative overview of a dataset, allowing researchers and
+analysts to understand the key characteristics of the data without
+delving into complex statistical analyses.
+
+Key Components of Descriptive Statistics
+
+```         
+Measures of Central Tendency:
+    Mean: The average of a set of values, calculated by summing all the values and dividing by the number of values.
+    Median: The middle value in a dataset when the values are sorted in ascending order. It divides the dataset into two equal halves.
+    Mode: The value that appears most frequently in a dataset.
+
+Measures of Dispersion (Variation):
+    Range: The difference between the maximum and minimum values in a dataset, indicating the spread of values.
+    Variance: The average of the squared differences from the mean, providing a measure of how much the values deviate from the mean.
+    Standard Deviation: The square root of the variance, indicating the average distance of each data point from the mean. It provides a clearer sense of dispersion since it is in the same units as the data.
+
+Shape of the Distribution:
+    Skewness: A measure of the asymmetry of the data distribution. A positive skew indicates a longer tail on the right side, while a negative skew indicates a longer tail on the left side.
+    Kurtosis: A measure of the "tailedness" of the data distribution, indicating whether the data has heavy or light tails compared to a normal distribution.
+
+Summary Statistics:
+    Minimum and Maximum: The smallest and largest values in the dataset.
+    Quartiles: Values that divide the dataset into four equal parts, with the first quartile (Q1), median (Q2), and third quartile (Q3) being particularly important for understanding the spread and center of the data.
+    Interquartile Range (IQR): The range between the first and third quartiles (Q3 - Q1), representing the middle 50% of the data.
+    
+```
+
+## 6.1 Measures of Central Tendency
+
+### 6.1.1 Mean
+
+Mean: The average of a set of values, calculated by summing all the
+values and dividing by the number of values.
+
+```{r}
+integers <- c(4, 3, 4, 4, 5, 4, 5, 3, 4, 4)
+mean(integers)
+```
+
+```{r}
+barplot(table(integers))
+```
+
+```{r}
+hist(integers, breaks = length(unique(integers)))
+```
+
+Is it useful to find mean value for our dataset?
+
+```{r}
+mean(dataset$len)
+```
+
+Let's load "dplyr" and filter it out
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+dose_1mg <- dataset %>% 
+  filter(dose == 1) %>% 
+  filter(supp == "OJ")
+```
+
+```{r}
+table(dose_1mg)
+```
+
+```{r}
+mean(dose_1mg$len)
+```
+
+In "dplyr" we can find all mean values for all groups at the same time
+
+```{r}
+dose_1mg_summary <- dataset %>% 
+  filter(dose == 1) %>% 
+  filter(supp == "OJ") %>% 
+  summarise(mean_len = mean(len))
+```
+
+```{r message=FALSE, warning=FALSE}
+dataset %>%
+  group_by(dose, supp) %>%
+  summarise(mean_len = mean(len))
+```
+
+What do we do when we group our data by columns
+
+```{r}
+dataset %>%
+  group_by(dose, supp)
+```
+
+If we take a closer look, we'll see that actually the mean value is the
+least frequent
+
+```{r}
+hist(dose_1mg$len)
+```
+
+### 6.1.2 Median
+
+Median: The middle value in a dataset when the values are sorted in
+ascending order. It divides the dataset into two equal halves.
+
+```{r}
+median(dose_1mg$len)
+```
+
+```{r}
+median(integers)
+```
+
+Comparing both mean and median
+
+```{r}
+dataset %>% 
+  group_by(dose, supp) %>% 
+  summarise(average = mean(len), 
+            median = median(len))
+```
+
+```{r}
+# For instance fish length in a lake
+skewed <- c(13, 15, 14, 16, 14, 15, 14, 13, 12, 7, 9, 10, 900, 789, 670)
+```
+
+```{r}
+hist(skewed)
+```
+
+What is the mean and median value here?
+
+```{r}
+mean(skewed)
+```
+
+```{r}
+median(skewed)
+```
+
+### 6.1.3 Mode
+
+Mode: The value that appears most frequently in a dataset.
+
+The mtcars dataset is a built-in dataset in R that contains information
+about various models of cars from the 1974 Motor Trend US magazine.
+
+Data Frame Structure: The dataset is a data frame with 32 rows
+(representing different car models) and 11 columns (representing various
+attributes of the cars). Variables (Columns):
+
+```         
+mpg: Miles per gallon (fuel efficiency)
+cyl: Number of cylinders in the engine
+disp: Displacement (in cubic inches)
+hp: Horsepower
+drat: Rear axle ratio
+wt: Weight (in thousands of pounds)
+qsec: 1/4 mile time (time taken to cover a quarter mile)
+vs: Engine type (0 = V/S, 1 = straight)
+am: Transmission (0 = automatic, 1 = manual)
+gear: Number of forward gears
+carb: Number of carburetors
+```
+
+```{r}
+data("mtcars")
+```
+
+```         
+am: Transmission (0 = automatic, 1 = manual)
+```
+
+What is the most popular transmission?
+
+```{r}
+# Mode calculation here performed without the use of any built-in functions =(
+transmission <- mtcars %>%
+                group_by(am) %>%             
+                summarise(count = n()) %>%    
+                filter(count == max(count)) %>%
+                pull(am) 
+
+if (transmission == 0) {print("automatic")} else {print("manual")}
+```
+
+## 6.2 Measures of Dispersion (Variation)
+
+### 6.2.1 Range
+
+Range: The difference between the maximum and minimum values in a
+dataset, indicating the spread of values.
+
+```{r}
+# reframe == summarise but for one column 
+mtcars %>%
+  reframe(range_mpg = range(mpg))
+```
+
+```{r}
+range(skewed)
+```
+
+### 6.2.2 Variance
+
+Variance: The average of the squared differences from the mean,
+providing a measure of how much the values deviate from the mean.
+
+![Variance](pictures/variance.jpeg)
+
+```{r}
+dataset %>% 
+  group_by(dose, supp) %>% 
+  summarise(variance = var(len),
+            average = mean(len),
+            median = median(len), 
+            range = range(len))
+```
+
+### 6.2.3 Standard Deviation
+
+Standard Deviation: The square root of the variance, indicating the
+average distance of each data point from the mean. It provides a clearer
+sense of dispersion since it is in the same units as the data.
+
+![Variance](pictures/sd.jpg)
+
+```{r}
+dataset %>% 
+  group_by(dose, supp) %>% 
+  summarise(variance = var(len),
+            sd = sd(len),
+            average = mean(len),
+            median = median(len), 
+            range = range(len))
+```
+
+### 6.2.4 Coefficient of variation (CV)
+
+The coefficient of variation (CV) is a standardized measure of
+dispersion of a probability distribution or frequency distribution. It
+is defined as the ratio of the standard deviation (SD) to the mean
+(average) and is often expressed as a percentage. The coefficient of
+variation is useful for comparing the relative variability of data sets
+that may have different units or different means.
+
+![Variance](pictures/cv.jpg)
+
+```{r}
+dataset %>% 
+  group_by(dose, supp) %>% 
+  summarise(variance = var(len),
+            sd = sd(len),
+            average = mean(len),
+            cv = round(sd(len)/mean(len)*100, 1)) %>%
+  mutate(cv = paste0(cv, "%"))
+```
+
+## 6.3 Shape of the Distribution
+
+Skewness: A measure of the asymmetry of the data distribution. A positive skew indicates a longer tail on the right side, while a negative skew indicates a longer tail on the left side. 
+
+Kurtosis: A measure of the "tailedness" of the data distribution, indicating whether the data has heavy or light tails compared to a normal distribution.
+
+Functions to calcuate such parameters are located in the package "moments"
+
+```{r}
+install.packages("moments")
+```
+
+```{r}
+library(moments)
+```
+
+ToothGrowth dataset, dose 1 mg
+
+```{r}
+hist(dose_1mg$len)
+```
+
+```{r}
+# Calculate skewness
+mpg_skewness <- skewness(dose_1mg$len)
+
+# Calculate kurtosis
+mpg_kurtosis <- kurtosis(dose_1mg$len)
+
+# Print the results
+print(paste("Skewenes (-3:3):", round(mpg_skewness, 2)))
+print(paste("Kurtosis (-2:10):", round(mpg_kurtosis, 2)))
+
+```
+
+mtcars dataset
+
+```{r}
+hist(mtcars$mpg)
+```
+
+```{r}
+# Calculate skewness
+mpg_skewness <- skewness(mtcars$mpg)
+
+# Calculate kurtosis
+mpg_kurtosis <- kurtosis(mtcars$mpg)
+
+# Print the results
+print(paste("Skewenes (-3:3):", round(mpg_skewness, 2)))
+print(paste("Kurtosis (-2:10):", round(mpg_kurtosis, 2)))
+
+```
+
+skewed vector
+
+```{r}
+barplot(table(skewed))
+```
+
+```{r}
+hist(skewed, breaks = length(unique(skewed)))
+```
+
+```{r}
+# Calculate skewness
+mpg_skewness <- skewness(skewed)
+
+# Calculate kurtosis
+mpg_kurtosis <- kurtosis(skewed)
+
+# Print the results
+print(paste("Skewenes (-3:3):", round(mpg_skewness, 2)))
+print(paste("Kurtosis (-2:10):", round(mpg_kurtosis, 2)))
+
+```
+
+## 6.4 Summary Statistics
+
+### 6.4.1 Minimum and Maximum: The smallest and largest values in the dataset.
+
+```{r}
+max(dataset$len)
+min(dataset$len)
+```
+
+### 6.4.2 Quartiles.
+
+Values that divide the dataset into four equal parts, with
+the first quartile (Q1), median (Q2), and third quartile (Q3) being
+particularly important for understanding the spread and center of the
+data.
+
+```{r}
+dataset %>% 
+  group_by(dose, supp) %>% 
+  summarise(
+    Q1 = quantile(len, 0.25),
+    Q2 = quantile(len, 0.5),
+    median = median(len),
+    Q3 = quantile(len, 0.75)
+  )
+```
+
+```{r}
+skewed_even <- c(13, skewed)
+sort(skewed_even)
+quantile(skewed_even, 0.25)
+```
+
+### 6.4.3 Interquartile Range (IQR)
+
+The range between the first and third quartiles (Q3 - Q1), representing the middle 50% of the data.
+
+Built-in function
+
+```{r}
+IQR(skewed_even)
+```
+
+IQR is a difference between Q3 and Q1
+
+```{r}
+quantile(skewed_even, 0.75) - quantile(skewed_even, 0.25)
+```
+
+Outliers detection
+
+![outliers](pictures/outliers.jpg)
+
+```{r}
+skewed_even
+Q1 <- quantile(skewed_even, 0.25)
+Q3 <- quantile(skewed_even, 0.75)
+IQR <- IQR(skewed_even)
+lower_threshold <- Q1-1.5*IQR
+upper_threshold <- Q3+1.5*IQR
+```
+
+```{r}
+skewed_even[skewed_even > lower_threshold & skewed_even < upper_threshold]
+```
+
+For representation purposes let's change extreme values to more close to others
+
+```{r}
+skewed_altered <- skewed_even
+skewed_altered[14] <- 35
+skewed_altered[15] <- 29
+skewed_altered[16] <- 26
+```
+
+Boxplot
+
+```{r}
+boxplot(skewed_altered, 
+        main = "Boxplot of skewed_even Values", 
+        ylab = "Values", 
+        col = "lightblue", 
+        outline = TRUE)
+
+# Add lines for Q1, Q3, and thresholds
+abline(h = Q1, col = "red", lty = 2)  # Q1
+abline(h = Q3, col = "blue", lty = 2)  # Q3
+abline(h = lower_threshold, col = "orange", lty = 2)  # Lower threshold
+abline(h = upper_threshold, col = "orange", lty = 2)  # Upper threshold
+
+# Identify outliers
+outliers <- skewed_altered[skewed_altered < lower_threshold | skewed_altered > upper_threshold]
+
+# Add text labels for outliers
+if (length(outliers) > 0) {
+    text(x = rep(1.1, length(outliers)), y = outliers, labels = outliers, pos = 4, col = "red")
+}
+```
+### 6.4.4 Built-in summary table
+
+```{r}
+summary(skewed_altered)
+```
+
+
+### Conclusion
+
+In this chapter we discussed basic concepts of descriptive statistics: main measures of central tendency, measures of dispersion, distribution shape and basic summary statistics. It is needed to provide a simple and informative overview of a dataset, allowing researchers and analysts to understand the key characteristics of the data without delving into complex statistical analyses.
+
+
+
